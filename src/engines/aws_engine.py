@@ -321,13 +321,12 @@ def audit_kms_rotation(findings_queue):
         keys = kms.list_keys()['Keys']
         for k in keys:
             kid = k['KeyId']
-            # Only check symmetric keys (rotation isn't for asymmetric)
-            try:
+            # We add a 'Describe' check to see if it's a Customer Key
+            metadata = kms.describe_key(KeyId=kid)['KeyMetadata']
+            if metadata['KeyManager'] == 'CUSTOMER': 
                 rotation = kms.get_key_rotation_status(KeyId=kid)
                 if not rotation['KeyRotationEnabled']:
                     findings_queue.put(f"KMS: Key {kid} has rotation DISABLED!")
-            except:
-                pass
     except Exception as e:
         logger.error(f"KMS Audit Failed: {str(e)}")
 

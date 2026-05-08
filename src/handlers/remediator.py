@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 # Clients for both services
 ec2 = boto3.client('ec2', region_name='us-east-1')
 s3 = boto3.client('s3')
+iam = boto3.client('iam')
 
 def revoke_public_access(group_id, protocol, port):
     """Removes a 0.0.0.0/0 rule from an EC2 Security Group."""
@@ -39,3 +40,41 @@ def secure_s3_bucket(bucket_name):
     except Exception as e:
         logger.error(f"❌ S3 Fix Failed: {str(e)}")
         return False
+
+import subprocess
+
+def heal_ebs_encryption():
+    """Bypasses Boto3 version issues by using the System CLI."""
+    try:
+        # If the SDK is too old, we use the CLI directly
+        subprocess.run(["aws", "ec2", "modify-ebs-default-encryption", "--enabled"], check=True)
+        logger.info("🛠️ AUTO-HEAL: Regional EBS Encryption ENABLED via CLI (+4 pts)")
+        return True
+    except Exception as e:
+        logger.error(f"EBS Heal Failed: {e}")
+        return False
+
+def heal_iam_password_policy():
+    """Fixes: IAM: No account password policy defined"""
+    try:
+        iam.update_account_password_policy(
+            MinimumPasswordLength=14,
+            RequireSymbols=True,
+            RequireNumbers=True,
+            RequireUppercaseCharacters=True,
+            PasswordReusePrevention=24
+        )
+        logger.info("🛠️ AUTO-HEAL: Strict IAM Password Policy APPLIED (+4 pts)")
+        return True
+    except Exception as e:
+        logger.error(f"IAM Policy Heal Failed: {e}")
+
+def heal_access_analyzer():
+    """Fixes: IAM: Access Analyzer is DISABLED"""
+    try:
+        analyzer = boto3.client('accessanalyzer')
+        analyzer.create_analyzer(analyzerName='SentryAnalyzer', type='ACCOUNT')
+        logger.info("🛠️ AUTO-HEAL: IAM Access Analyzer CREATED (+4 pts)")
+        return True
+    except Exception as e:
+        logger.error(f"Analyzer Heal Failed: {e}")

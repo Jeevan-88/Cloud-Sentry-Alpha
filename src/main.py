@@ -2,6 +2,7 @@ import logging
 import os
 import queue
 from concurrent.futures import ThreadPoolExecutor
+from src.handlers.remediator import heal_ebs_encryption, heal_iam_password_policy, heal_access_analyzer
 from src.engines.aws_engine import (
     audit_security_groups, 
     audit_s3_buckets, 
@@ -47,7 +48,9 @@ def run_sentinel():
     logger.info("🚀 Cloud-Sentry-Alpha: Initializing Master Multi-Service Audit...")
     master_findings = []
     findings_queue = queue.Queue()
-    
+    # heal_ebs_encryption()
+    # heal_iam_password_policy()
+    # heal_access_analyzer()
     
     audit_tasks = [
         # AWS 
