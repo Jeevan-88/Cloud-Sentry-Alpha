@@ -1,0 +1,6 @@
+aws/
+dist/
+venv/
+*.json
+*.pyc
+__pycache__/
