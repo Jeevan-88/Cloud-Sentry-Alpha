@@ -25,9 +25,8 @@ jobs:
       - name: Install Multi-Cloud Dependencies
         run: |
           pip install boto3 \
-            google-cloud-storage google-cloud-sql \
+            google-cloud-storage cloud-sql-python-connector \
             azure-mgmt-storage azure-mgmt-sql azure-mgmt-network azure-identity
-          # These prevent the 'ModuleNotFoundError' for GCP and Azure engines
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
