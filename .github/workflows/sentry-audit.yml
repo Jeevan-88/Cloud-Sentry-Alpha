@@ -1,20 +1,20 @@
 name: Cloud-Sentry-Daily-Scan
 on:
-  schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+  workflow_dispatch: 
 
 permissions:
-  id-token: write  
-  contents: read   
+  id-token: write 
+  contents: read  
 
 jobs:
   audit-cloud:
     runs-on: ubuntu-latest
+    env:
+      [cite_start]FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5 
         with:
           python-version: '3.9'
       - name: Install Boto3
@@ -26,5 +26,5 @@ jobs:
           aws-region: us-east-1
       - name: Execute Sentinel
         env:
-          PYTHONPATH: .
+          PYTHONPATH: . 
         run: python3 src/main.py
