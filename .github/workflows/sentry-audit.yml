@@ -22,11 +22,21 @@ jobs:
         with:
           python-version: '3.10' # Upgraded to meet 2026 Boto3 standards
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' # Future-proofed for 2026/2027 standards
+
       - name: Install Multi-Cloud Dependencies
         run: |
           pip install boto3 \
-            google-cloud-storage cloud-sql-python-connector \
-            azure-mgmt-storage azure-mgmt-sql azure-mgmt-network azure-identity
+            google-cloud-storage \
+            google-api-python-client \
+            cloud-sql-python-connector \
+            azure-mgmt-storage \
+            azure-mgmt-sql \
+            azure-mgmt-network \
+            azure-identity
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
