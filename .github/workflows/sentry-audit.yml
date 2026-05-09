@@ -1,24 +1,30 @@
 name: Cloud-Sentry-Daily-Scan
 on:
   schedule:
-    - cron: '0 0 * * *' # Midnight daily
-  workflow_dispatch: # Allows manual run button
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  id-token: write  
+  contents: read   
 
 jobs:
   audit-cloud:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
       - name: Install Boto3
         run: pip install boto3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::462457676536:role/github 
+          aws-region: us-east-1
       - name: Execute Sentinel
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: 'us-east-1'
           PYTHONPATH: .
         run: python3 src/main.py
